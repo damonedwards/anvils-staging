@@ -5,7 +5,7 @@
     <group>catalog</group>
     <id>513ef8e7-85c0-4958-88f6-3cb6683ede9c</id>
     <loglevel>INFO</loglevel>
-    <name>update partner delivery forecast</name>
+    <name>update_partner_delivery_forecast</name>
     <nodeFilterEditable>false</nodeFilterEditable>
     <schedule>
       <dayofmonth />
