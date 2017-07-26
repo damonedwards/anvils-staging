@@ -26,6 +26,7 @@
     <scheduleEnabled>true</scheduleEnabled>
     <sequence keepgoing='false' strategy='node-first'>
       <command>
+        <description>Attempt graceful stop</description>
         <errorhandler keepgoingOnSuccess='true'>
           <script><![CDATA[#!/bin/bash
 #/ usage: kill.sh ?dir?
