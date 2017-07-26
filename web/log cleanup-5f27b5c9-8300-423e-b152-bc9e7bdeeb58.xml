@@ -1,0 +1,25 @@
+<joblist>
+  <job>
+    <description>Process, rotate, cleanup logs</description>
+    <executionEnabled>true</executionEnabled>
+    <group>web</group>
+    <id>5f27b5c9-8300-423e-b152-bc9e7bdeeb58</id>
+    <loglevel>INFO</loglevel>
+    <name>log cleanup</name>
+    <nodeFilterEditable>false</nodeFilterEditable>
+    <schedule>
+      <dayofmonth />
+      <month day='1/1' month='*' />
+      <time hour='2' minute='0' seconds='0' />
+      <year year='*' />
+    </schedule>
+    <scheduleEnabled>true</scheduleEnabled>
+    <sequence keepgoing='false' strategy='node-first'>
+      <command>
+        <description>Cleanup logs</description>
+        <exec>echo "Cleaning up logs... complete"</exec>
+      </command>
+    </sequence>
+    <uuid>5f27b5c9-8300-423e-b152-bc9e7bdeeb58</uuid>
+  </job>
+</joblist>
