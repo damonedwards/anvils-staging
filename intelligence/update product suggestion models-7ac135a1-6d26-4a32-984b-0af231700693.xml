@@ -1,0 +1,29 @@
+<joblist>
+  <job>
+    <description>Regenerate upsell offers and "you may also like" suggestions.</description>
+    <executionEnabled>true</executionEnabled>
+    <group>intelligence</group>
+    <id>7ac135a1-6d26-4a32-984b-0af231700693</id>
+    <loglevel>INFO</loglevel>
+    <name>update product suggestion models</name>
+    <nodeFilterEditable>false</nodeFilterEditable>
+    <schedule>
+      <dayofmonth />
+      <month day='1/1' month='*' />
+      <time hour='0/2' minute='0' seconds='0' />
+      <year year='*' />
+    </schedule>
+    <scheduleEnabled>true</scheduleEnabled>
+    <sequence keepgoing='false' strategy='node-first'>
+      <command>
+        <description>Regenerate models</description>
+        <exec>echo "Updating models... complete"</exec>
+      </command>
+      <command>
+        <description>Update catalog</description>
+        <exec>echo "Updating catalog... complete"</exec>
+      </command>
+    </sequence>
+    <uuid>7ac135a1-6d26-4a32-984b-0af231700693</uuid>
+  </job>
+</joblist>
