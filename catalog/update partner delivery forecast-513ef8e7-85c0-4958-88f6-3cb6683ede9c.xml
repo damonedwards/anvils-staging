@@ -1,0 +1,33 @@
+<joblist>
+  <job>
+    <description>Query partner EDI and update current delivery estimates in catalog</description>
+    <executionEnabled>true</executionEnabled>
+    <group>catalog</group>
+    <id>513ef8e7-85c0-4958-88f6-3cb6683ede9c</id>
+    <loglevel>INFO</loglevel>
+    <name>update partner delivery forecast</name>
+    <nodeFilterEditable>false</nodeFilterEditable>
+    <schedule>
+      <dayofmonth />
+      <month day='1/1' month='*' />
+      <time hour='0/4' minute='0' seconds='0' />
+      <year year='*' />
+    </schedule>
+    <scheduleEnabled>true</scheduleEnabled>
+    <sequence keepgoing='false' strategy='node-first'>
+      <command>
+        <description>Fetch data from partner EDI</description>
+        <exec>echo "Fetch data... complete"</exec>
+      </command>
+      <command>
+        <description>Calculate delivery forecasts</description>
+        <exec>echo "Calculate delivery forecasts... complete"</exec>
+      </command>
+      <command>
+        <description>Update delivery estimates in catalog</description>
+        <exec>echo "Update delivery_estimate fields in catalog... complete"</exec>
+      </command>
+    </sequence>
+    <uuid>513ef8e7-85c0-4958-88f6-3cb6683ede9c</uuid>
+  </job>
+</joblist>
