@@ -1,0 +1,48 @@
+<joblist>
+  <job>
+    <context>
+      <options preserveOrder='true'>
+        <option name='container' required='true'>
+          <description>Enter the container ID</description>
+        </option>
+      </options>
+    </context>
+    <description>Retrieve formatted docker inspect data for specified container.</description>
+    <executionEnabled>true</executionEnabled>
+    <group>intelligence</group>
+    <id>37c7a25a-0ca0-4f80-80eb-40b460df7d94</id>
+    <loglevel>INFO</loglevel>
+    <name>docker_inspect</name>
+    <nodeFilterEditable>false</nodeFilterEditable>
+    <scheduleEnabled>true</scheduleEnabled>
+    <sequence keepgoing='false' strategy='node-first'>
+      <command>
+        <description>Run docker inspect</description>
+        <exec>docker inspect ${option.container}</exec>
+        <plugins>
+          <LogFilter type='render-datatype'>
+            <config>
+              <datatype>application/json</datatype>
+            </config>
+          </LogFilter>
+        </plugins>
+      </command>
+      <command>
+        <description>Run docker inspect</description>
+        <node-step-plugin type='docker-container-inspect-workflow-step'>
+          <configuration>
+            <entry key='container' value='${option.container}' />
+          </configuration>
+        </node-step-plugin>
+        <plugins>
+          <LogFilter type='render-datatype'>
+            <config>
+              <datatype>application/json</datatype>
+            </config>
+          </LogFilter>
+        </plugins>
+      </command>
+    </sequence>
+    <uuid>37c7a25a-0ca0-4f80-80eb-40b460df7d94</uuid>
+  </job>
+</joblist>

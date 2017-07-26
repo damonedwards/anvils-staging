@@ -1,0 +1,51 @@
+<joblist>
+  <job>
+    <description>Display the container stats for all running docker containers. </description>
+    <dispatch>
+      <excludePrecedence>true</excludePrecedence>
+      <keepgoing>false</keepgoing>
+      <rankOrder>ascending</rankOrder>
+      <successOnEmptyNodeFilter>false</successOnEmptyNodeFilter>
+      <threadcount>1</threadcount>
+    </dispatch>
+    <executionEnabled>true</executionEnabled>
+    <group>intelligence</group>
+    <id>1e37c0b9-0345-4bcc-a66c-6df959c46f0e</id>
+    <loglevel>INFO</loglevel>
+    <name>get container stats</name>
+    <nodeFilterEditable>false</nodeFilterEditable>
+    <nodefilters>
+      <filter>tags: docker</filter>
+    </nodefilters>
+    <nodesSelectedByDefault>true</nodesSelectedByDefault>
+    <scheduleEnabled>true</scheduleEnabled>
+    <sequence keepgoing='false' strategy='node-first'>
+      <command>
+        <description>Display container stats</description>
+        <node-step-plugin type='docker-container-stats-step'>
+          <configuration>
+            <entry key='container' value='${node.name}' />
+            <entry key='format' value='table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}' />
+          </configuration>
+        </node-step-plugin>
+      </command>
+      <pluginConfig>
+        <LogFilter type='highlight-output'>
+          <config>
+            <fgcolor>green</fgcolor>
+            <mode>bold</mode>
+            <regex>([0-9]+\.[0-9]+%)</regex>
+          </config>
+        </LogFilter>
+        <LogFilter type='highlight-output'>
+          <config>
+            <fgcolor>green</fgcolor>
+            <mode>bold</mode>
+            <regex>([0-9]+\.[0-9]+MiB)</regex>
+          </config>
+        </LogFilter>
+      </pluginConfig>
+    </sequence>
+    <uuid>1e37c0b9-0345-4bcc-a66c-6df959c46f0e</uuid>
+  </job>
+</joblist>

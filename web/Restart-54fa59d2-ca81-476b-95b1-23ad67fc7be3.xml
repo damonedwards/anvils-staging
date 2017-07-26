@@ -1,0 +1,70 @@
+<joblist>
+  <job>
+    <context>
+      <options preserveOrder='true'>
+        <option enforcedvalues='true' name='method' values='anvils:stop,anvils:stop --force' />
+      </options>
+    </context>
+    <description>restart the web servers</description>
+    <dispatch>
+      <excludePrecedence>true</excludePrecedence>
+      <keepgoing>true</keepgoing>
+      <rankOrder>ascending</rankOrder>
+      <successOnEmptyNodeFilter>true</successOnEmptyNodeFilter>
+      <threadcount>2</threadcount>
+    </dispatch>
+    <executionEnabled>true</executionEnabled>
+    <group>web</group>
+    <id>54fa59d2-ca81-476b-95b1-23ad67fc7be3</id>
+    <loglevel>INFO</loglevel>
+    <name>Restart</name>
+    <nodeFilterEditable>false</nodeFilterEditable>
+    <nodefilters>
+      <filter>tags: www</filter>
+    </nodefilters>
+    <nodesSelectedByDefault>true</nodesSelectedByDefault>
+    <scheduleEnabled>true</scheduleEnabled>
+    <sequence keepgoing='false' strategy='node-first'>
+      <command>
+        <description>Stop the service</description>
+        <jobref group='web' name='stop'>
+          <arg line='-method ${option.method}' />
+        </jobref>
+      </command>
+      <command>
+        <description>Rotate the log</description>
+        <node-step-plugin type='nixy-file-rotate'>
+          <configuration>
+            <entry key='compress' value='true' />
+            <entry key='file' value='${node.anvils:server-dir}/log' />
+            <entry key='tstamp-format' value='+%Y%m%d' />
+          </configuration>
+        </node-step-plugin>
+      </command>
+      <command>
+        <description>Start the service</description>
+        <jobref group='web' name='start' />
+      </command>
+      <command>
+        <description>Check the pid</description>
+        <node-step-plugin type='nixy-waitfor-file-exists'>
+          <configuration>
+            <entry key='file' value='${node.anvils:server-dir}/pid' />
+            <entry key='interval' value='1' />
+            <entry key='maxtry' value='10' />
+          </configuration>
+        </node-step-plugin>
+        <plugins>
+          <LogFilter type='highlight-output'>
+            <config>
+              <fgcolor>green</fgcolor>
+              <mode>bold</mode>
+              <regex>OK</regex>
+            </config>
+          </LogFilter>
+        </plugins>
+      </command>
+    </sequence>
+    <uuid>54fa59d2-ca81-476b-95b1-23ad67fc7be3</uuid>
+  </job>
+</joblist>

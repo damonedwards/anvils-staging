@@ -1,0 +1,70 @@
+<joblist>
+  <job>
+    <context>
+      <options preserveOrder='true'>
+        <option enforcedvalues='true' name='method' required='true' values='anvils:stop,anvils:stop --force' />
+      </options>
+    </context>
+    <description>stop the web servers</description>
+    <dispatch>
+      <excludePrecedence>true</excludePrecedence>
+      <keepgoing>true</keepgoing>
+      <rankOrder>ascending</rankOrder>
+      <successOnEmptyNodeFilter>true</successOnEmptyNodeFilter>
+      <threadcount>1</threadcount>
+    </dispatch>
+    <executionEnabled>true</executionEnabled>
+    <group>web</group>
+    <id>8cc8c236-c994-4a82-933d-376a18f0ec74</id>
+    <loglevel>INFO</loglevel>
+    <name>stop</name>
+    <nodeFilterEditable>true</nodeFilterEditable>
+    <nodefilters>
+      <filter>tags: www</filter>
+    </nodefilters>
+    <nodesSelectedByDefault>true</nodesSelectedByDefault>
+    <scheduleEnabled>true</scheduleEnabled>
+    <sequence keepgoing='false' strategy='node-first'>
+      <command>
+        <errorhandler keepgoingOnSuccess='true'>
+          <script><![CDATA[#!/bin/bash
+#/ usage: kill.sh ?dir?
+
+set -eu
+
+(( $# != 1 )) && {
+	grep '^#/ usage:' <"$0" | cut -c4- >&2
+	exit 2	
+}
+DIR=$1
+
+echo 'Web killed!']]></script>
+          <scriptargs>${node.anvils:sever-dir}</scriptargs>
+        </errorhandler>
+        <script><![CDATA[#!/bin/bash
+#/ usage: stop.sh ?dir? ?method? 
+
+set -eu
+
+(( $# != 2 )) && {
+	grep '^#/ usage:' <"$0" | cut -c4- >&2
+	exit 2
+}
+DIR=$1
+METHOD=$2
+
+if [[ -f $DIR/pid ]]
+then	
+	PID=$(< $DIR/pid)	
+	echo "kill $PID"
+	rm -f $DIR/pid
+	echo "- Web stopped (pid=${PID}) using method: $METHOD" | tee -a $DIR/log
+fi
+
+]]></script>
+        <scriptargs>${node.anvils:server-dir} ${option.method}</scriptargs>
+      </command>
+    </sequence>
+    <uuid>8cc8c236-c994-4a82-933d-376a18f0ec74</uuid>
+  </job>
+</joblist>

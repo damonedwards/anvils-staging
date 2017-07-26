@@ -1,0 +1,34 @@
+<joblist>
+  <job>
+    <context>
+      <options preserveOrder='true'>
+        <option name='database_name' required='true' value='catalog'>
+          <description>the name of the database</description>
+        </option>
+      </options>
+    </context>
+    <description>show the tables</description>
+    <executionEnabled>true</executionEnabled>
+    <group>catalog</group>
+    <id>0480a509-1350-4f15-bc36-89374082682b</id>
+    <loglevel>INFO</loglevel>
+    <name>show tables</name>
+    <nodeFilterEditable>false</nodeFilterEditable>
+    <scheduleEnabled>true</scheduleEnabled>
+    <sequence keepgoing='false' strategy='node-first'>
+      <command>
+        <node-step-plugin type='mysql-execute-step'>
+          <configuration>
+            <entry key='database_host' value='mysql.anvils.com' />
+            <entry key='database_name' value='${option.database_name}' />
+            <entry key='database_password' value='keys/dbms/acmeDB.password' />
+            <entry key='database_username' value='acmeDB' />
+            <entry key='dryrun' value='true' />
+            <entry key='sql_script' value='show tables;' />
+          </configuration>
+        </node-step-plugin>
+      </command>
+    </sequence>
+    <uuid>0480a509-1350-4f15-bc36-89374082682b</uuid>
+  </job>
+</joblist>

@@ -1,0 +1,190 @@
+<joblist>
+  <job>
+    <context>
+      <options preserveOrder='true'>
+        <option delimiter=' ' enforcedvalues='true' multivalued='true' name='catalogs' required='true' value='partner' values='inventory,partner,shipping-rates'>
+          <description>catalog name(s)</description>
+        </option>
+        <option name='db-password' secure='true' storagePath='keys/Targa.local/database.password' valueExposed='true' />
+      </options>
+    </context>
+    <description><![CDATA[rebuild the catalog data
+
+---
+
+some new stuff
+
+and one more line.
+
+Flow Chart
+--------------------------------------------------------------------------------
+
+*************************************************************************************************
+*                                      .                                                        *
+*   .---------.                       / \                                                       *
+*  |   START   |                     /   \        .-+-------+-.      ___________                *
+*   '----+----'    .-------.    A   /     \   B   | |COMPLEX| |     /           \      .-.      *
+*        |        |   END   |<-----+CHOICE +----->| |       | +--->+ PREPARATION +--->| X |     *
+*        v         '-------'        \     /       | |PROCESS| |     \___________/      '-'      *
+*    .---------.                     \   /        '-+---+---+-'                                 *
+*   /  INPUT  /                       \ /                                                       *
+*  '-----+---'                         '                                                        *
+*        |                             ^                                                        *
+*        v                             |                                                        *
+*  .-----------.                 .-----+-----.        .-.                                       *
+*  |  PROCESS  +---------------->|  PROCESS  |<------+ X |                                      *
+*  '-----------'                 '-----------'        '-'                                       *
+*************************************************************************************************
+
+
+     
+System Diagram
+--------------------------------------------------------------------------------
+
+*************************************************************************************************
+*                                      .-.                           .--------.                 *
+*                                   .-+   |                         |          |                *
+*                               .--+       '--.                     |'--------'|                *
+*                              |  Server Cloud |<------------------>| Database |                *
+*                               '-------------'                     |          |                *
+*                                   ^      ^                         '--------'                 *
+*                    Internet       |      |                              ^                     *
+*          .------------------------'      '-------------.                |                     *
+*          |                                             |                v                     *
+*          v                                             v              .------.       .------. *
+*     .--------.      WiFi     .--------.  Bluetooth  .-----.          / #  # /|      / #  # /| *
+*     |        |<------------->|        |<---------->|       |        +------+/| LAN +------+/| *
+*     |Windows |               |  OS X  |            |  iOS  |        |      +/|<--->|      +/| *
+*     +--------+               +--------+            |       |        |Ubuntu+/|     |Ubuntu+/| *
+*    /// ____ \\\             /// ____ \\\           |   o   |        |      +/      |      +/  *
+*   '------------'           '------------'           '-----'         '------'       '------'   *
+*      Laptop 1                 Laptop 2              Tablet 1         Dedicated Server Rack    *
+*************************************************************************************************
+
+
+]]></description>
+    <dispatch>
+      <excludePrecedence>true</excludePrecedence>
+      <keepgoing>true</keepgoing>
+      <rankOrder>ascending</rankOrder>
+      <successOnEmptyNodeFilter>true</successOnEmptyNodeFilter>
+      <threadcount>1</threadcount>
+    </dispatch>
+    <executionEnabled>true</executionEnabled>
+    <group>catalog</group>
+    <id>2128cc1c-9c22-4938-81f2-41df1997df3c</id>
+    <loglevel>INFO</loglevel>
+    <name>nightly_catalog_rebuild</name>
+    <nodeFilterEditable>true</nodeFilterEditable>
+    <nodefilters>
+      <filter>tags: db</filter>
+    </nodefilters>
+    <nodesSelectedByDefault>true</nodesSelectedByDefault>
+    <notification>
+      <onfailure>
+        <email recipients='bizops@anvils.com' />
+      </onfailure>
+      <onsuccess>
+        <email recipients='bizops@anvils.com' />
+      </onsuccess>
+    </notification>
+    <schedule>
+      <month month='*' />
+      <time hour='00' minute='00' seconds='0' />
+      <weekday day='*' />
+      <year year='*' />
+    </schedule>
+    <scheduleEnabled>true</scheduleEnabled>
+    <sequence keepgoing='false' strategy='node-first'>
+      <command>
+        <description>Connect</description>
+        <exec>echo "Connecting to database with credentials ${node.username}:${option.db-password} ..."</exec>
+        <plugins>
+          <LogFilter type='mask-passwords'>
+            <config>
+              <color>magenta</color>
+              <replacement>[SECURE]</replacement>
+            </config>
+          </LogFilter>
+        </plugins>
+      </command>
+      <command>
+        <description>Call the Rebuild Tool</description>
+        <plugins>
+          <LogFilter type='render-datatype'>
+            <config>
+              <datatype>application/json</datatype>
+            </config>
+          </LogFilter>
+        </plugins>
+        <script><![CDATA[#!/bin/bash
+declare -ra CATALOGS=( $@ )
+declare -i count=0
+echo "["
+for catalog in ${CATALOGS[*]}
+do
+(( count++ ))
+cat <<EOF
+{
+    "Updated":"$(date)",
+    "By":"@job.username@",
+    "Server": {
+        "Name": "@node.name@",
+        "Region":"@node.anvils:location@",
+        "Owner":"@node.anvils:database-owner@"
+    },
+    "Catalog": {
+        "Catalog": "$catalog",
+        "Database": {
+        "Customer":"@node.anvils:customer@",
+        "Tables":[
+         "${catalog}_SKU","${catalog}_PRICE","${catalog}_VENDOR"
+        ]
+        }
+    }
+}
+EOF
+(( count < ${#CATALOGS[*]} )) && echo ","
+done
+echo "]"]]></script>
+        <scriptargs>${option.catalogs}</scriptargs>
+      </command>
+      <command>
+        <description>Query Rebuilt Tool to Confirm Status</description>
+        <plugins>
+          <LogFilter type='key-value-data'>
+            <config>
+              <logData>false</logData>
+              <regex>^RUNDECK:DATA:(.+?)\s*=\s*(.+)$</regex>
+            </config>
+          </LogFilter>
+          <LogFilter type='quiet-output'>
+            <config>
+              <loglevel>verbose</loglevel>
+              <matchLoglevel>normal</matchLoglevel>
+              <quietMatch>true</quietMatch>
+              <regex>Complete</regex>
+            </config>
+          </LogFilter>
+        </plugins>
+        <script><![CDATA[echo "Checking status of rebuild..."
+echo "RUNDECK:DATA:REBUILD_STATUS=Complete"]]></script>
+        <scriptargs />
+      </command>
+      <command>
+        <description>End</description>
+        <exec>echo "Rebuild status: ${data.REBUILD_STATUS}"</exec>
+        <plugins>
+          <LogFilter type='highlight-output'>
+            <config>
+              <fgcolor>green</fgcolor>
+              <mode>bold</mode>
+              <regex>Complete</regex>
+            </config>
+          </LogFilter>
+        </plugins>
+      </command>
+    </sequence>
+    <uuid>2128cc1c-9c22-4938-81f2-41df1997df3c</uuid>
+  </job>
+</joblist>
