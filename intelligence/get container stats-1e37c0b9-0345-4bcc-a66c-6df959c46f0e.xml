@@ -5,7 +5,7 @@
       <excludePrecedence>true</excludePrecedence>
       <keepgoing>false</keepgoing>
       <rankOrder>ascending</rankOrder>
-      <successOnEmptyNodeFilter>false</successOnEmptyNodeFilter>
+      <successOnEmptyNodeFilter>true</successOnEmptyNodeFilter>
       <threadcount>1</threadcount>
     </dispatch>
     <executionEnabled>true</executionEnabled>
